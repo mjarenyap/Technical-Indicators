@@ -39,11 +39,19 @@ def macd_vs_signal(context, data):
         
         open_orders = get_open_orders()
         if macd[-1] < signal[-1]:
-            if s not in open_orders:
+            print("BUYING")        
+            print("MACD Value:", macd[-1])
+            print("Signal Value:", signal[-1])
+            print()
+            if s not in open_orders and is_wide(macd[-1], signal[-1]) >= 1:
                 order_target_percent(s, 1)
         
         elif macd[-1] > signal[-1]:
-            if s not in open_orders:
+            print("SELLING")        
+            print("MACD Value:", macd[-1])
+            print("Signal Value:", signal[-1])
+            print()
+            if s not in open_orders and is_wide(macd[-1], signal[-1]) >= 1:
                 order_target_percent(s, -1.0)
                 
 def ema12_vs_ema26(context, data):
@@ -61,3 +69,7 @@ def ema12_vs_ema26(context, data):
         elif ema12[-1] < ema26[-1]:
             if s not in open_orders:
                 order_target_percent(s, -1.0)
+                
+def is_wide(line_1, line_2):
+    mouth = abs(line_1 - line_2)
+    return mouth

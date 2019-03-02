@@ -35,15 +35,15 @@ def ema_vs_ema(context, data):
         open_orders = get_open_orders()
         
         if short_ema[-1] > long_ema[-1]:
-            if s not in open_orders:
+            if s not in open_orders and is_wide(short_ema[-1], long_ema[-1]) >= 1:
                 order_target_percent(s, 1.0)
                 
         elif short_ema[-1] < long_ema[-1]:
-            if s not in open_orders:
+            if s not in open_orders and is_wide(short_ema[-1], long_ema[-1]) >= 1:
                 order_target_percent(s, -1.0)
     
 def ema_vs_closing(context, data):
-    period = 50
+    period = 2
     freq = "1d"
     my_stock_series = data.history(context.securities, fields="price", bar_count=period, frequency=freq)
     
@@ -60,3 +60,7 @@ def ema_vs_closing(context, data):
         elif curr_price < ema_result:
             if s not in open_orders:
                 order_target_percent(s, -1.0)
+                
+def is_wide(line_1, line_2):
+    mouth = abs(line_1 - line_2)
+    return mouth

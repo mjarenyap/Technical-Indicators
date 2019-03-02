@@ -14,29 +14,37 @@ def initialize(context):
     """
     # AAPL, MSFT, and SPY
     context.securities = [sid(24)]
-    context.small = 30
-    context.large = 70
     context.bar_interval = '1d'
-    context.bar_count = 200
+    context.bar_count = 2
+    context.curr_obv = 0
     
     schedule_function(rebalance,
                       date_rules.every_day(),
                       time_rules.market_open(minutes=30))
 
 def rebalance(context, data):
-    period = 14
-    stock_series = data.history(context.securities, 'price', context.bar_count, context.bar_interval)
+    stock_series = data.history(context.securities, 'close', context.bar_count, context.bar_interval)
+    
+    volume_series = data.history(context.securities, 'volume', context.bar_count, context.bar_interval)
     
     open_orders = get_open_orders()
     
     for s in context.securities:
-        rsi = talib.RSI(stock_series[s], timeperiod=period)
-        rsi_result = rsi[-1]
+        curr_close = stock_series[s][-1]
+        prior_close = stock_series[s][0]
         
-        if rsi_result <= context.small:
+        curr_volume = volume_series[s][-1]
+        
+        if curr_close > prior_close:
+            context.curr_obv = context.curr_obv + curr_volume
+            
+        elif curr_close < prior_close:
+            context.curr_obv = context.curr_obv - curr_volume
+        
+        if context.curr_obv <= stock_series[s][-1]:
             if s not in open_orders:
                 order_target_percent(s, -1.0)
                 
-        elif rsi_result >= context.large:
+        elif context.curr_obv >= stock_series[s][-1]:
             if s not in open_orders:
                 order_target_percent(s, 1.0)
