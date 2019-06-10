@@ -31,7 +31,7 @@ def rsi(stock, data):
 	if rsi_result >= large: BUY
 	'''
 
-	return [rsi_result, small, large]
+	return rsi_result
 
 def obv(stock, data):
 	# IMPORTANT: Please set context.curr_obv = 0 in the initialize()
