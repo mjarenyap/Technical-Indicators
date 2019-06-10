@@ -13,21 +13,6 @@ def ema_vs_ema(stock, data):
 
 	return [long_ema, short_ema]
 
-def ema_vs_closing(stock, data):
-	period = 2 # getting the PREVIOUS and CURRENT status of the stock
-	freq = "1d"
-	stock_series = data.history(stock, fields="price", bar_count=period, frequency=freq)
-	ema_result = talib.EMA(stock_series, timeperiod=period)[-1]
-	curr_price = stock_series.iloc[-1]
-
-	'''
-	EMA vs PRICE algorithm
-	if curr_price > ema_result: BUY
-	elif curr_price < ema_result: SELL
-	'''
-
-	return [ema_result, curr_price]
-
 def rsi(stock, data):
 	period = 14
 	bar_count = 200
@@ -71,8 +56,3 @@ def obv(stock, data):
 	if context.curr_obv <= stock_series[-1]: SELL
 	elif context.curr_obv >= stock_series[-1]: BUY
 	'''
-
-	return stock_series[-1]
-
-	return 
-
