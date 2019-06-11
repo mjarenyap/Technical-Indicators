@@ -1,6 +1,39 @@
 import talib
 import numpy as np
 
+def atr(stock, data):
+	hist = data.history(stock, ['high', 'low', 'close'], 30, '1d')
+	atr = talib.ATR(hist['high'], hist['low'], hist['close'], timeperiod=14)[-1]
+
+	price = data.current(stock, 'price') # current stock price
+	prev_close = hist['close'][-2] # previous stock price
+
+	upside_signal = price - (prev_close + atr)
+	downside_signal = prev_close - (price + atr)
+
+	'''
+	ATR ALGORITHM
+	if upside_signal > 0: BUY
+	elif downside_signal > 0: SELL
+	'''
+
+	return [upside_signal, downside_signal]
+
+def stoch(stock, data):
+	hist = data.history(stock, ['high', 'low', 'close'], 30, '1d')
+	slowk, slowd = talib.STOCH(hist['high'], hist['low'], hist['close'], fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
+
+	# get the most recent value
+	slowk = slowk[-1]
+	slowd = slowd[-1]
+
+	'''
+	if slowk < 10 or slowd < 10: BUY
+	elif slowk > 90 or slowd > 90: SELL
+	'''
+
+	return [slowk, slowd]
+
 def bollinger_bands(stock, data):
 	stock_series = data.history(stock, fields="price", bar_count=200, frequency='1d')
 	middle_band = stock_series.mean()
